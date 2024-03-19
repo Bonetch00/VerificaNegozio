@@ -7,9 +7,25 @@ require __DIR__ . '/vendor/autoload.php';
 
 $app = AppFactory::create();
 
-$app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello world!");
-    return $response;
-});
+function autoload($classname)
+{
+    $paths = ['/', '/src/', '/controllers/'];
+
+    foreach ($paths as $path) {
+        $filename = __DIR__ . $path . $classname . ".php";
+        if (file_exists($filename)) {
+            require_once $filename;
+            return;
+        }
+    }
+}
+
+spl_autoload_register("autoload");
+
+$app->get('/negozio', "NegozioController:index");
+$app->get('/negozio/articoli',"NegozioController:articoli");
+$app->get('/negozio/articoli/{id}',"NegozioController:articolo");
+$app->get('/negozio/ordini',"NegozioController:ordini");
+
 
 $app->run();
